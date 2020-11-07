@@ -7,7 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 from course.models import Course
 from course.serializers import CourseSerializer
 from rest_framework.decorators import api_view
-
+from django.views.generic import TemplateView,ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 

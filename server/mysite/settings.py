@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'rest_framework',
     'course.apps.CourseConfig',
+    'rest_framework',
     'corsheaders',
     
 ]
@@ -87,14 +87,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'CLIENT':{
-            'name': 'course',
-            'host': 'mongodb+srv://vishalmongo:vsharmaa0077@cluster0.q0bvj.mongodb.net/course?retryWrites=true&w=majority',
-            'username':'vishalmongo',
-            'password':'vsharmaa0077',
-            'authMechanism':'SCRAM-SHA-1',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',        
+        'NAME': str(BASE_DIR / 'db.sqlite3'),      
     }
 }
 
