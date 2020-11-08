@@ -1,24 +1,44 @@
 import Link from 'next/link';
+import React from 'react';
 
-async function AddCourse(){
-	document.getElementById("loader").style.display = "block";
-  await fetch("http://localhost:8000/course/createcourse",{
-    method: 'post',
-    headers:({'Content-Type':'application/json'}),
-    body: JSON.stringify({
-      title: document.getElementById("coursename").value,
-      price: document.getElementById("courseprice").value
-    })
-  }).then(response=> response.json())
 
-  window.location.pathname = '/'
-}
-export default () => (
-  <div>
+class AllCourses extends React.Component{
+	constructor(){
+		super();
+		this.state={
+			title: '',
+			price: 0
+		}
+	}
+
+	updateTitle= async e=>{
+		await this.setState({title: e.target.value})
+	}
+
+	updatePrice= async e=>{
+		await this.setState({price: e.target.value})
+	}
+
+	AddCourse=async ()=>{
+		await fetch("http://localhost:8000/course/createcourse",{
+	    method: 'post',
+	    headers:({'Content-Type':'application/json'}),
+	    body: JSON.stringify({
+	      title: this.state.title,
+	      price: this.state.price
+	    })
+	  }).then(response=> response.json())
+	await document.getElementById("home").click();
+
+
+	}
+	render(){
+		return(
+			<div>
    <nav>
            <div >
               <ul>
-               <li ><Link id="listcourses" href="/"><a>All course</a></Link></li>
+               <li ><Link id="listcourses" href="/"><a id="home">All course</a></Link></li>
                <li ><Link  href="/allcourses"><a>Add courses</a></Link></li>
                <li><Link href="/updatecourses"><a>update course</a></Link></li>                                      
               </ul>
@@ -28,17 +48,15 @@ export default () => (
    <h1>Create a new course</h1>
    <div id="ct">
    <label >Course Title</label>
-   <input type="text" id="coursename" name="coursename"></input>
+   <input type="text" id="coursename" name="coursename" onChange={this.updateTitle}></input>
    </div>
    <div id="cp">
    <label >Course price</label>
-   <input type="number" id="courseprice" name="courseprice"></input>
+   <input type="number" id="courseprice" name="courseprice" defaultValue="0" onChange={this.updatePrice}></input>
    </div>
-   <div id="loader">
-   Loading....
-   </div>
+   
    <div>
-   <button onClick={AddCourse}>Add Course</button>
+   <button onClick={this.AddCourse}>Add Course</button>
   </div>
    </div>
 
@@ -91,12 +109,13 @@ nav ul li a:active{
 #ct{
   margin:10px;
 }
-#loader{
-	display:none;
-}
+
 `}</style>
   </div>
-);
+			);
+	}
+}
 
 
 
+export default AllCourses;

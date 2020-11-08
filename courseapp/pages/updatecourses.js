@@ -1,63 +1,95 @@
 
 import Link from 'next/link';
-var titledef = '';
-var pricedef='';
-async function UpdateCourse(event){
-	document.getElementById("loader").style.display = "block";
-var myid = event.target.parentNode.parentNode.id;
-var newtitle = event.target.parentNode.parentNode.getElementsByTagName("input")[0].value;
-var newprice = event.target.parentNode.parentNode.getElementsByTagName("input")[1].value;
-var urlstring = "http://localhost:8000/course/updatecourse/"+myid;
-await fetch(urlstring,{
-	method: 'put',
-	headers: ({'Content-Type':'application/json'}),
-	body: JSON.stringify({
-		title: newtitle,
-		price: newprice
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+
+class UpdateCourses extends React.Component{
+		
+	constructor()
+	{
+		super();
+		this.state={
+			courseslist:[],
+			currid:'',
+			currtitle:'',
+			currprice:0
+		}
+	}
+	getCourses=()=>{
+	 fetch("http://localhost:8000/course/getcourses").then(response=> response.json()).then(data=>{
+		this.setState({courseslist: data})
+		
 	})
-}).then(response=> response.json())
-window.location.pathname = '/'
-}
+	 
 
-async function DeleteCourse(event){
-	document.getElementById("loader").style.display = "block";
-var myid2 = event.target.parentNode.parentNode.parentNode.id;
-
-var urlstring2 = "http://localhost:8000/course/deletecourse/"+myid2;
-await fetch(urlstring2,{
-	method: 'delete'
-	
-})
-window.location.pathname = '/'
-
-}
-export default function AllCourses({courses}) {
-  return (
+	}
+	updateCourse= async () =>{
+		var urlstring = "http://localhost:8000/course/updatecourse/"+this.state.currid;
+		 await fetch(urlstring,{
+			method: 'put',
+			headers: ({'Content-Type':'application/json'}),
+			body: JSON.stringify({
+				id: this.state.currid,
+				title: this.state.currtitle,
+				price: this.state.currprice
+			})
+		}).then(response=> response.json());
+			
+			
+		await document.getElementById("home").click();
+	}
+	deleteCourse=async (e)=>
+	{
+		
+		var urlstring2 = "http://localhost:8000/course/deletecourse/"+e.target.parentNode.parentNode.parentNode.id;
+		
+		 await fetch(urlstring2,{
+			method: 'delete'			
+		})
+		 await this.getCourses();
+	}
+	updateTitle=async e => {
+	 	await this.setState({currtitle: e.target.value, currid:e.target.parentNode.id,currprice: e.target.parentNode.getElementsByTagName("input")[1].value})
+	 	
+	 	
+	 }
+	 updatePrice=async e => {
+	 	await this.setState({currprice: e.target.value, currid:e.target.parentNode.parentNode.id,currtitle:e.target.parentNode.parentNode.getElementsByTagName("input")[0].value})
+	 	
+	 	 
+	 }
+	componentDidMount(){
+		
+		
+		 this.getCourses();
+	}
+	render()
+	{
+		
+		return(
     <div>
    <nav>
            <div >
               <ul id="navbarlinks">
-               <li><Link href="/"><a>All course</a></Link></li>
+               <li><Link href="/" ><a id="home">All course</a></Link></li>
                <li><Link href="/allcourses"><a>Add courses</a></Link></li>
-               <li id="updatelink"><Link href='/updatecourses'><a id="updatenow">update course</a></Link></li>                                      
+               <li id="updatelink"><Link href='/updatecourses'><a>update course</a></Link></li>                                      
               </ul>
            </div>
    </nav>
    <div>
    <ul id="tasklist" className="list-group">
    {
-     courses.map((course)=>(
+     this.state.courseslist.map((course)=>(
        <li id={course.id} key={course.id}><label>title: </label>
-       <input type="text" defaultValue={course.title}></input>
-       <span><button onClick={UpdateCourse}>Update</button></span>
+       <input type="text" defaultValue={course.title} onChange={this.updateTitle} ></input>
+       <span><button onClick={this.updateCourse}>Update</button></span>
       
        <div><label>price: </label>
-       <input type="number" defaultValue={course.price}></input>
-        <span><button onClick={DeleteCourse}>Delete</button></span>
+       <input type="number" defaultValue={course.price} onChange={this.updatePrice}></input>
+        <span><button onClick={this.deleteCourse}>Delete</button></span>
        </div>
-       <div id="loader">
-   Loading....
-   </div>
+      
        </li>
 
        ))
@@ -122,21 +154,13 @@ button{
 position: absolute;
 right:50%;
 }
-#loader{
-	display:none;
-}
+
 
 `}</style>
   </div>
     );
+	
+}
 }
 
-export async function getStaticProps(){
-  const res = await fetch('http://localhost:8000/course/getcourses');
-  const courses = await res.json()
-   return {
-    props: {
-      courses,
-    },
-  }
-}
+export default UpdateCourses;
